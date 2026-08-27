@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
 function AppointmentSuccessContent() {
   const searchParams = useSearchParams();
@@ -32,22 +32,22 @@ function AppointmentSuccessContent() {
         </h2>
 
         <div className="space-y-4">
-          <div className="flex justify-between gap-4 border-b border-slate-200 pb-3">
+          <div className="flex justify-between border-b border-slate-200 pb-3">
             <span className="text-slate-500">Doctor</span>
             <span className="font-semibold text-slate-900">{doctor}</span>
           </div>
 
-          <div className="flex justify-between gap-4 border-b border-slate-200 pb-3">
+          <div className="flex justify-between border-b border-slate-200 pb-3">
             <span className="text-slate-500">Date</span>
             <span className="font-semibold text-slate-900">{date}</span>
           </div>
 
-          <div className="flex justify-between gap-4 border-b border-slate-200 pb-3">
+          <div className="flex justify-between border-b border-slate-200 pb-3">
             <span className="text-slate-500">Time</span>
             <span className="font-semibold text-slate-900">{time}</span>
           </div>
 
-          <div className="flex justify-between gap-4">
+          <div className="flex justify-between">
             <span className="text-slate-500">Token Number</span>
             <span className="font-bold text-blue-600">{token}</span>
           </div>
@@ -76,6 +76,7 @@ function AppointmentSuccessContent() {
 export default function AppointmentSuccessPage() {
   return (
     <main className="min-h-screen bg-slate-50">
+      {/* NAVBAR */}
       <nav className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <Link href="/" className="flex items-center gap-3">
@@ -98,12 +99,20 @@ export default function AppointmentSuccessPage() {
         </div>
       </nav>
 
+      {/* SUCCESS CONTENT */}
       <section className="flex min-h-[80vh] items-center justify-center px-6 py-12">
-        <Suspense fallback={<div className="text-slate-500">Loading appointment details...</div>}>
+        <Suspense
+          fallback={
+            <div className="text-slate-500">
+              Loading appointment details...
+            </div>
+          }
+        >
           <AppointmentSuccessContent />
         </Suspense>
       </section>
 
+      {/* FOOTER */}
       <footer className="border-t border-slate-200 bg-slate-950 px-6 py-8 text-center text-sm text-slate-400">
         © 2026 MedPulse Hospital. All rights reserved.
       </footer>
