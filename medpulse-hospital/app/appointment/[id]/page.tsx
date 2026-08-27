@@ -60,9 +60,15 @@ export default function AppointmentPage() {
       return;
     }
 
-    alert("Appointment booked successfully!");
+    const tokenNum = "MP-" + Math.floor(100 + Math.random() * 900);
+    const queryParams = new URLSearchParams({
+      doctor: doctor.name,
+      date,
+      time,
+      token: tokenNum,
+    });
 
-    router.push("/appointment-success");
+    router.push(`/appointment-success?${queryParams.toString()}`);
   };
 
   return (
