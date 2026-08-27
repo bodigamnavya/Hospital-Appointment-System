@@ -2,36 +2,46 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
+  const { login } = useAuth();
+  const router = useRouter();
+
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
 
     if (!email || !password) {
-      setMessage("Please enter email and password.");
+      setError("Please enter both email and password.");
       return;
     }
 
-    setMessage("Login successful! Welcome to MedPulse.");
+    setLoading(true);
+    const result = await login(email, password);
+    setLoading(false);
 
-    // Later we will connect this to database/backend.
+    if (result.success) {
+      router.push("/dashboard");
+    } else {
+      setError(result.message || "Invalid email or password.");
+    }
   };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 px-6 py-10">
       <div className="mx-auto flex min-h-[90vh] max-w-md items-center justify-center">
-
         <div className="w-full rounded-3xl bg-white p-8 shadow-xl ring-1 ring-slate-200">
-
           {/* LOGO */}
           <div className="text-center">
-
             <Link href="/" className="inline-flex">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 text-3xl">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-3xl text-white shadow-md shadow-blue-200">
                 🏥
               </div>
             </Link>
@@ -40,20 +50,25 @@ export default function LoginPage() {
               Welcome Back
             </h1>
 
-            <p className="mt-2 text-slate-500">
-              Login to your MedPulse account
+            <p className="mt-2 text-sm text-slate-500">
+              Login to your MedPulse patient account
             </p>
-
           </div>
 
           {/* LOGIN FORM */}
-          <form onSubmit={handleLogin} className="mt-8 space-y-5">
+          <form onSubmit={handleLogin} className="mt-8 space-y-4">
+            {/* ERROR ALERT */}
+            {error && (
+              <div className="rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-700 border border-red-100">
+                ⚠️ {error}
+              </div>
+            )}
 
             {/* EMAIL */}
             <div>
               <label
                 htmlFor="email"
-                className="mb-2 block font-semibold text-slate-700"
+                className="mb-1.5 block text-sm font-semibold text-slate-700"
               >
                 Email Address
               </label>
@@ -63,8 +78,9 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                placeholder="name@example.com"
+                required
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm"
               />
             </div>
 
@@ -72,7 +88,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="mb-2 block font-semibold text-slate-700"
+                className="mb-1.5 block text-sm font-semibold text-slate-700"
               >
                 Password
               </label>
@@ -83,68 +99,47 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                required
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm"
               />
             </div>
 
-            {/* FORGOT PASSWORD */}
-            <div className="text-right">
-              <button
-                type="button"
-                className="text-sm font-semibold text-blue-600 hover:text-blue-700"
-                onClick={() => setMessage("Password recovery will be added later.")}
-              >
-                Forgot Password?
-              </button>
+            {/* DEMO CREDENTIALS HINT */}
+            <div className="rounded-xl bg-blue-50/60 p-3 border border-blue-100 text-xs text-blue-800">
+              <span className="font-bold">Demo Login:</span> <code className="bg-blue-100/70 px-1 py-0.5 rounded">navya@example.com</code> / <code className="bg-blue-100/70 px-1 py-0.5 rounded">password123</code>
             </div>
 
             {/* LOGIN BUTTON */}
             <button
               type="submit"
-              className="w-full rounded-xl bg-blue-600 py-3.5 font-bold text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700"
+              disabled={loading}
+              className="w-full rounded-xl bg-blue-600 py-3.5 font-bold text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 disabled:opacity-50 text-base mt-2"
             >
-              Login
+              {loading ? "Signing in..." : "Login"}
             </button>
-
           </form>
 
-          {/* MESSAGE */}
-          {message && (
-            <div className="mt-5 rounded-xl bg-blue-50 p-4 text-center text-sm font-semibold text-blue-700">
-              {message}
-            </div>
-          )}
-
           {/* REGISTER */}
-          <div className="mt-7 text-center">
-
-            <p className="text-slate-500">
-              Don't have an account?
-            </p>
-
+          <div className="mt-7 text-center text-sm">
+            <p className="text-slate-500">Don't have an account?</p>
             <Link
               href="/register"
-              className="mt-2 inline-block font-bold text-blue-600 hover:text-blue-700"
+              className="mt-1 inline-block font-bold text-blue-600 hover:text-blue-700"
             >
               Create Account
             </Link>
-
           </div>
 
           {/* BACK HOME */}
           <div className="mt-6 border-t border-slate-200 pt-5 text-center">
-
             <Link
               href="/"
-              className="text-sm font-medium text-slate-500 hover:text-blue-600"
+              className="text-xs font-medium text-slate-400 hover:text-blue-600 transition"
             >
               ← Back to Home
             </Link>
-
           </div>
-
         </div>
-
       </div>
     </main>
   );
